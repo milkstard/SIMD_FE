@@ -1,7 +1,7 @@
 # CLAUDE.md — IncidentHub Frontend (React 18 + TypeScript)
 
 ## What this is
-SPA for the Service Incident & Monitoring Dashboard: users **report** incidents, **track** them through a
+SPA for the Service Incident and Monitoring Dashboard: users **report** incidents, **track** them through a
 workflow, and **monitor** application health on a live dashboard. It talks to the ASP.NET Core API
 (`/api/v1`) over REST and receives live updates over SignalR (`/hubs/incidents`).
 
@@ -10,7 +10,24 @@ Imported (loaded into context every session):
 - API contract — owned by the backend repo; endpoints, DTOs, enums, errors, SignalR events. If it conflicts with this file, the contract wins: @../SIMD_BE/docs/API-CONTRACT.md
 
 Reference only (NOT imported — read on demand when you need the original rationale, requirements or trade-offs):
-- `docs/System Design Service Incident & Monitoring Dashboard.md`
+- `docs/System Design Service Incident and Monitoring Dashboard.md`
+- `docs/specs/` — one spec per slice (e.g. `02_01_...md`); the source of requirements, acceptance criteria and out-of-scope lists
+
+## Implementation ledger (`docs/implementation/`)
+- `current-status.md` — audit of implementation progress for Claude and the user (imported below):
+  @docs/implementation/current-status.md
+- `deferred-items.md` — items the specs push to a later phase (**Scheduled**) or that can't be built yet (**Blocked**, with blocker and unblock steps). IDs (`D-01`…) are never reused.
+- `completed-items.md` — deferred items that have since been delivered, keeping their original ID.
+
+Status audit: **before** starting an implementation, add a row to `current-status.md` (`In progress`, spec, scope,
+start date). **When done**, update that row (status, finish date, checks run, follow-ups). One row per implementation;
+never delete rows.
+
+When planning an implementation:
+1. Read the relevant spec, `current-status.md` **and** `deferred-items.md` first.
+2. Add newly found items that the spec explicitly schedules for a future phase (usually its "Out of scope" list).
+3. Never defer something mandatory for the spec being implemented. If it can't be built yet, list it as **Blocked**.
+4. If the implementation delivers a deferred item, remove its row from `deferred-items.md` and add it to `completed-items.md` (original ID, spec, date).
 
 ## Commands
 ```bash

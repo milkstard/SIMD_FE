@@ -1,5 +1,5 @@
 ---
-name: incidenthub-design
+name: frontend
 description: Rules for designing or building any IncidentHub screen, component or mockup: colour tokens, typography, spacing, layout, components, do's and don'ts, and a consistency checklist.
 ---
 
