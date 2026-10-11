@@ -27,7 +27,8 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-06 | `useCan` role checks | 02_02 out of scope | Later feature specs (needs D-01) |
 | D-07 | SignalR `accessTokenFactory` | 02_01 and 02_02 out of scope | FE-04 |
 | D-08 | Saved-draft sentence in the Session expired note ("Your unsent report draft is still saved on this device.") | 02_02 decision (generic copy chosen) | Report form spec (draft saving) |
-| D-09 | Colour-scheme toggle (the theme follows the system setting for now) | 02_01 plan | FE-03 (Zustand UI state) |
-| D-10 | Route-level code splitting (the build warns on the 500 kB chunk; 155 KB gzip is under the 250 KB target) | 02_01 verification | FE-03 (lazy routes) |
-| D-11 | App shell, sidebar, routes, `ErrorBoundary` | 02_01 out of scope | FE-03 |
+| D-09 | Colour-scheme toggle (the theme follows the system setting for now) | 02_01 plan | Later spec (kept deferred in 03_01; Zustand UI state) |
 | D-12 | Role-based route guards (e.g. Admin-only screens) | 02_01 out of scope | FE-13 |
+| D-13 | Not-found page for unknown URLs and `404` API responses (until then the root `ErrorBoundary` shows "Page not found") | 03_01 out of scope | Later feature spec |
+| D-14 | ⌘K search / command palette in the top bar | 03_02 decision | Later spec |
+| D-15 | Offline banner copy "Refreshing every 30 seconds until the connection returns." (needs the 30 s polling fallback) | 03_02 decision | FE-04 (polling fallback) |

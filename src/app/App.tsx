@@ -1,9 +1,6 @@
-import { Typography } from '@mui/material';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
 
 export function App() {
-  return (
-    <Typography component="h1" variant="h4" sx={{ p: 2 }}>
-      IncidentHub
-    </Typography>
-  );
+  return <RouterProvider router={router} />;
 }
