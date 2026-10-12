@@ -9,3 +9,5 @@ Items that were listed in `docs/implementation/deferred-items.md` and have since
 |---|---|---|---|---|
 | D-10 | Route-level code splitting (`React.lazy` per screen; main 161 KB gzip) | 02_01 verification | 03_01 | 2026-10-11 |
 | D-11 | App shell, nav rail, top bar (routes + `ErrorBoundary` delivered in 03_01) | 02_01 out of scope | 03_02 | 2026-10-11 |
+| D-07 | SignalR `accessTokenFactory` | 02_01 and 02_02 out of scope | 04_01 | 2026-10-12 |
+| D-15 | Offline banner copy "Refreshing every 30 seconds until the connection returns." (30 s polling fallback) | 03_02 decision | 04_01 | 2026-10-12 |

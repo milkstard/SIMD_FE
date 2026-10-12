@@ -14,7 +14,7 @@ const copy: Record<ConnectionState, { word: string; detail: string }> = {
   reconnecting: { word: 'Reconnecting…', detail: 'Changes made by others may be delayed.' },
   offline: {
     word: 'Offline',
-    detail: 'Live updates are paused. Reload to see the latest changes.',
+    detail: 'Refreshing every 30 seconds until the connection returns.',
   },
 };
 

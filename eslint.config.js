@@ -22,7 +22,7 @@ export default tseslint.config(
   {
     // Components must not touch the SignalR connection directly (CLAUDE.md / FE-04).
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/realtime/**', 'src/**/*.test.{ts,tsx}'],
+    ignores: ['src/realtime/**', 'src/test/**', 'src/**/*.test.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',

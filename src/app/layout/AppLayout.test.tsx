@@ -112,7 +112,7 @@ describe('AppLayout', () => {
       renderAt('/');
       const status = await screen.findByRole('status');
       expect(status).toHaveTextContent('Offline');
-      expect(screen.getByText(/Live updates are paused/)).toBeInTheDocument();
+      expect(screen.getByText(/Refreshing every 30 seconds/)).toBeInTheDocument();
 
       act(() => setConnectionState('reconnecting'));
       act(() => {
@@ -127,7 +127,7 @@ describe('AppLayout', () => {
       });
       expect(screen.getByRole('status')).toHaveTextContent('Live');
       expect(screen.queryByText(/Changes made by others/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Live updates are paused/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Refreshing every 30 seconds/)).not.toBeInTheDocument();
     });
   });
 });

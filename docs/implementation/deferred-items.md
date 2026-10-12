@@ -17,6 +17,7 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-01 | `useCurrentUser()` in `src/shared/hooks/useCurrentUser.ts`, using `meKeys.current()` (already in `src/api/keys.ts`) | 02_02 | BE-11 (`GET /me` + `CurrentUser` in swagger) | Run `npm run gen:api`, use the generated type (no hand-written DTO), then build the hook |
 | D-02 | `GET /api/v1/me` MSW handler in `src/test/msw/handlers.ts` | 02_02 | BE-11 | Add together with D-01 |
 | D-03 | `useCurrentUser.test.tsx` (resolves with `roles: ['Responder']`, cache entry under `meKeys.current()`) | 02_02 | BE-11 | Add together with D-01. It completes the 02.02 AC "After login, `useCurrentUser()` resolves with roles matching the signed-in account's groups" |
+| D-16 | Real-time event handlers (`registerHandlers`) typed from generated `IncidentSummary`, `IncidentDetail`, `Comment`, `DashboardSummary`, `AppStatusItem`, `AppNotification` | 04_02 | `src/api/generated/schema.d.ts` has none of these types (BE swagger not yet regenerated) | Backend adds them to `contracts/swagger.json`, run `npm run gen:api`, then implement 04_02 against the generated types |
 
 ## Scheduled for a future phase
 
@@ -25,10 +26,8 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-04 | Configurable sign-in help and privacy links (service desk link, Privacy / Accessibility footer, environment label) | 02_01 out of scope | Later spec (config-driven links) |
 | D-05 | UI behaviour for 403 / 409 / 429 / 500 (toasts, optimistic rollback, `Retry-After`) | 02_02 out of scope | The feature specs that use `apiRequest` |
 | D-06 | `useCan` role checks | 02_02 out of scope | Later feature specs (needs D-01) |
-| D-07 | SignalR `accessTokenFactory` | 02_01 and 02_02 out of scope | FE-04 |
 | D-08 | Saved-draft sentence in the Session expired note ("Your unsent report draft is still saved on this device.") | 02_02 decision (generic copy chosen) | Report form spec (draft saving) |
 | D-09 | Colour-scheme toggle (the theme follows the system setting for now) | 02_01 plan | Later spec (kept deferred in 03_01; Zustand UI state) |
 | D-12 | Role-based route guards (e.g. Admin-only screens) | 02_01 out of scope | FE-13 |
 | D-13 | Not-found page for unknown URLs and `404` API responses (until then the root `ErrorBoundary` shows "Page not found") | 03_01 out of scope | Later feature spec |
 | D-14 | ⌘K search / command palette in the top bar | 03_02 decision | Later spec |
-| D-15 | Offline banner copy "Refreshing every 30 seconds until the connection returns." (needs the 30 s polling fallback) | 03_02 decision | FE-04 (polling fallback) |

@@ -22,7 +22,8 @@ export class ApiError extends Error {
   }
 }
 
-async function getToken(forceRefresh: boolean): Promise<string> {
+/** Access token for the API; also used by the SignalR `accessTokenFactory`. */
+export async function getToken(forceRefresh = false): Promise<string> {
   try {
     const result = await msalInstance.acquireTokenSilent({
       scopes: [config.apiScope],

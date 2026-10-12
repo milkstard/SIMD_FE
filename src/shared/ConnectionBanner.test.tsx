@@ -16,7 +16,7 @@ describe('ConnectionBanner', () => {
   it.each([
     ['live', 'Live', 'Updates arrive as they happen.'],
     ['reconnecting', 'Reconnecting…', 'Changes made by others may be delayed.'],
-    ['offline', 'Offline', 'Live updates are paused. Reload to see the latest changes.'],
+    ['offline', 'Offline', 'Refreshing every 30 seconds until the connection returns.'],
   ] as const)('shows the %s word, detail and a dot', (state, word, detail) => {
     const { container } = renderBanner(state);
     expect(screen.getByText(word)).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('ConnectionBanner', () => {
   it('hides the detail when compact', () => {
     renderBanner('offline', { compact: true });
     expect(screen.getByText('Offline')).toBeInTheDocument();
-    expect(screen.queryByText(/Live updates are paused/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Refreshing every 30 seconds/)).not.toBeInTheDocument();
   });
 
   it('is a status live region only when asked to announce', () => {
