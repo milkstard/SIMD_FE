@@ -77,6 +77,14 @@ describe('SignalRProvider', () => {
     expect(screen.getByText('Offline')).toBeInTheDocument();
   });
 
+  it('registers event handlers on mount and removes them on unmount', async () => {
+    const { fake, unmount } = setup();
+    await act(async () => {});
+    expect(fake.on).toHaveBeenCalledTimes(6);
+    unmount();
+    expect(fake.off).toHaveBeenCalledTimes(6);
+  });
+
   it('stops the connection and goes Offline on unmount', async () => {
     const { fake, unmount } = setup();
     await act(async () => {});

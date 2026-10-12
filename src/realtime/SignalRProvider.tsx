@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { setConnectionState } from './connectionStore';
 import { createConnection } from './createConnection';
+import { registerHandlers } from './handlers';
 import { SignalRContext } from './useSignalRConnection';
 import { useOfflineFallback } from './useOfflineFallback';
 
@@ -22,6 +23,8 @@ export function SignalRProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     queryClientRef.current = queryClient;
   }, [queryClient]);
+
+  useEffect(() => registerHandlers(connection, queryClient), [connection, queryClient]);
 
   useEffect(() => {
     let disposed = false;
