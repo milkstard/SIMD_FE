@@ -22,7 +22,7 @@ export default tseslint.config(
   {
     // Components must not touch the SignalR connection directly (CLAUDE.md / FE-04).
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/realtime/**', 'src/test/**', 'src/**/*.test.{ts,tsx}'],
+    ignores: ['src/realtime/**', 'src/test/fakeConnection.ts', 'src/**/*.test.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -31,6 +31,12 @@ export default tseslint.config(
             {
               name: '@microsoft/signalr',
               message: 'Use hooks from src/realtime/; only realtime/ may import SignalR.',
+            },
+          ],
+          patterns: [
+            {
+              group: ['@/realtime/*', '**/realtime/*'],
+              message: 'Import from @/realtime only; the rest of realtime/ is internal.',
             },
           ],
         },

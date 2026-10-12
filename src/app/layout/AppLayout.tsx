@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useConnectionState } from '@/realtime/connectionStore';
+import { useConnectionState } from '@/realtime';
 import { ConnectionBanner } from '@/shared/ConnectionBanner';
 import { NavRail } from './NavRail';
 import { TopBar } from './TopBar';

@@ -16,6 +16,7 @@ export function createFakeConnection() {
     state: HubConnectionState.Disconnected as HubConnectionState,
     start: vi.fn(() => Promise.resolve()),
     stop: vi.fn(() => Promise.resolve()),
+    invoke: vi.fn<(method: string, ...args: unknown[]) => Promise<void>>(() => Promise.resolve()),
     onreconnecting: vi.fn((cb: Callback) => void callbacks.reconnecting.push(cb)),
     onreconnected: vi.fn((cb: Callback) => void callbacks.reconnected.push(cb)),
     onclose: vi.fn((cb: Callback) => void callbacks.close.push(cb)),

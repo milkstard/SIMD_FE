@@ -2,7 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import NotificationsNoneOutlined from '@mui/icons-material/NotificationsNoneOutlined';
 import { Box, Button, IconButton } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useConnectionState } from '@/realtime/connectionStore';
+import { useConnectionState } from '@/realtime';
 import { ConnectionBanner } from '@/shared/ConnectionBanner';
 import { UserAvatar } from '@/shared/UserAvatar';
 

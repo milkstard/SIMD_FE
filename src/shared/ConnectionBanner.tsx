@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import type { ConnectionState } from '@/realtime/connectionStore';
+import type { ConnectionState } from '@/realtime';
 
 interface ConnectionBannerProps {
   state: ConnectionState;
