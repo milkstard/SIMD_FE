@@ -29,6 +29,8 @@ When planning an implementation:
 3. Never defer something mandatory for the spec being implemented. If it can't be built yet, list it as **Blocked**.
 4. If the implementation delivers a deferred item, remove its row from `deferred-items.md` and add it to `completed-items.md` (original ID, spec, date).
 
+When a spec's implementation is done (checks pass, ledger updated), run the `/spec-quality-gate` skill for it.
+
 ## Commands
 ```bash
 npm install
