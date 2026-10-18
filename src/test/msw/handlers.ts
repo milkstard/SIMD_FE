@@ -10,6 +10,7 @@ export const handlers: RequestHandler[] = [
   http.get(api('/applications'), () =>
     HttpResponse.json({ items: [checkoutApp, catalogApp], nextCursor: null, totalCount: null }),
   ),
+  http.get(api('/incidents/similar'), () => HttpResponse.json([])),
   http.post(api('/incidents'), () => HttpResponse.json(createdIncident, { status: 201 })),
   http.post(api('/attachments'), async ({ request }) => {
     const file = (await request.formData()).get('file');

@@ -7,20 +7,6 @@ export function DescriptionFields({ control }: { control: ReportControl }) {
   return (
     <Stack spacing={4}>
       <Controller
-        name="title"
-        control={control}
-        render={({ field, fieldState }) => (
-          <TextField
-            {...field}
-            required
-            fullWidth
-            label="Title"
-            error={fieldState.invalid}
-            helperText={fieldState.error?.message ?? 'A short summary of what is wrong.'}
-          />
-        )}
-      />
-      <Controller
         name="description"
         control={control}
         render={({ field, fieldState }) => (

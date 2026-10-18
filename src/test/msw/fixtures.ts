@@ -31,3 +31,15 @@ export const pendingAttachment: components['schemas']['AttachmentDto'] = {
   sizeBytes: 2048,
   scanStatus: 'Pending',
 };
+
+const similarStatuses = ['New', 'Triaged', 'InProgress', 'OnHold', 'Reopened', 'New'] as const;
+
+/** Six matches: the hints cap the list at five. */
+export const similarIncidents: components['schemas']['IncidentSummaryDto'][] = similarStatuses.map(
+  (status, index) => ({
+    id: `5e1a0000-0000-4000-8000-00000000000${index + 1}`,
+    number: `INC-${2001 + index}`,
+    title: `Checkout error variant ${index + 1}`,
+    status,
+  }),
+);

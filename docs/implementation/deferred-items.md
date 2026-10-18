@@ -37,3 +37,6 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-20 | Polling or live refresh of attachment scan status after upload | 05_02 out of scope | Later spec |
 | D-21 | Downloading attachments | 05_02 out of scope | FE-07 (incident detail) |
 | D-22 | Attachments on comments | 05_02 out of scope | Comments spec |
+| D-23 | Auto-selecting or merging into a suggested duplicate | 05_03 out of scope | Later spec |
+| D-24 | Highlighting matched text in duplicate hints | 05_03 out of scope | Later spec |
+| D-25 | Closing incidents as duplicates | 05_03 out of scope | FE-07 (incident detail) |

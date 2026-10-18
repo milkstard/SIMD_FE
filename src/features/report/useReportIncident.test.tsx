@@ -230,3 +230,17 @@ describe('submitting a report', () => {
     expect(await screen.findByText('The report is too large to send.')).toBeInTheDocument();
   });
 });
+
+describe('duplicate hints', () => {
+  it('still submits the report while the hints request fails', async () => {
+    server.use(http.get('*/incidents/similar', () => new HttpResponse(null, { status: 500 })));
+    respondWith(created);
+    const user = setup();
+    await fillValidReport(user);
+    expect(await screen.findByText("Couldn't check for similar incidents.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+    expect(await screen.findByText('Incident page INC-1042')).toBeInTheDocument();
+  });
+});

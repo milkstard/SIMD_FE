@@ -9,7 +9,9 @@ import { useToast } from '@/shared/toast/useToast';
 import { ApplicationFields } from './ApplicationFields';
 import { AttachmentDropzone } from './AttachmentDropzone';
 import { DescriptionFields } from './DescriptionFields';
+import { DuplicateHints } from './DuplicateHints';
 import { SeverityField } from './SeverityField';
+import { TitleField } from './TitleField';
 import { applyProblemErrors, getExistingIncidentNumber, problemErrorKeys } from './problemMapping';
 import {
   reportIncidentFields,
@@ -154,6 +156,10 @@ export function ReportIncidentForm({ applications }: { applications: Application
         )}
         <ApplicationFields control={control} resetField={resetField} applications={applications} />
         <SeverityField control={control} />
+        <Stack spacing={2}>
+          <TitleField control={control} />
+          <DuplicateHints control={control} />
+        </Stack>
         <DescriptionFields control={control} />
         <AttachmentDropzone control={control} onPendingChange={handleUploadingChange} />
         <Box>

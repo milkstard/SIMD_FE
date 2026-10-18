@@ -11,6 +11,9 @@ export const incidentKeys = {
   detail: (number: string) => [...incidentKeys.details(), number] as const,
   comments: (incidentId: string) => [...incidentKeys.all, 'comments', incidentId] as const,
   history: (incidentId: string) => [...incidentKeys.all, 'history', incidentId] as const,
+  // Outside lists(): the report form hints are not a list the realtime handlers should patch.
+  similar: (applicationId: string, title: string) =>
+    [...incidentKeys.all, 'similar', { applicationId, title }] as const,
 };
 
 export const applicationKeys = {

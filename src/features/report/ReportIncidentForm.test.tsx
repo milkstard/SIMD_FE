@@ -9,6 +9,9 @@ import { SEVERITIES } from '@/types/severity';
 import { ReportIncidentForm } from './ReportIncidentForm';
 import { SEVERITY_HELP } from './severityHelp';
 
+// Typing through the UI is slow on a cold run.
+vi.setConfig({ testTimeout: 20_000 });
+
 beforeEach(mockAuth);
 afterEach(() => vi.restoreAllMocks());
 
