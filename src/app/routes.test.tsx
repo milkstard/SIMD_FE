@@ -1,14 +1,22 @@
 import { ThemeProvider } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
+import { mockAuth } from '@/test/renderWithProviders';
 import { routes } from './routes';
 import { theme } from './theme';
+
+// The /report screen loads applications, so it needs a query client and a token.
+beforeEach(mockAuth);
+afterEach(() => vi.restoreAllMocks());
 
 function renderAt(path: string) {
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   render(
     <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </ThemeProvider>,
   );
 }

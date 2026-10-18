@@ -12,8 +12,14 @@ interface IncidentHubPalette {
   focus: string;
   focusOnNav: string;
   spark: string;
+  sevCritical: string;
   sevCriticalTint: string;
+  sevHigh: string;
   sevHighTint: string;
+  sevMedium: string;
+  sevMediumTint: string;
+  sevLow: string;
+  sevLowTint: string;
   statusOperationalTint: string;
 }
 
@@ -68,6 +74,10 @@ const light = {
   sevCriticalTint: '#ffe6ea',
   sevHigh: '#b34700',
   sevHighTint: '#ffedd8',
+  sevMedium: '#846400',
+  sevMediumTint: '#fff3c4',
+  sevLow: '#46557a',
+  sevLowTint: '#e7ecf8',
   statusOperational: '#0b7a50',
   statusOperationalTint: '#d8f6e8',
 };
@@ -90,6 +100,10 @@ const dark: typeof light = {
   sevCriticalTint: '#3e1824',
   sevHigh: '#ffa95e',
   sevHighTint: '#3c2412',
+  sevMedium: '#f2d158',
+  sevMediumTint: '#352c0e',
+  sevLow: '#b3bfe0',
+  sevLowTint: '#252b45',
   statusOperational: '#5fe0a8',
   statusOperationalTint: '#123326',
 };
@@ -111,8 +125,14 @@ const palette = (t: typeof light) => ({
   focus: t.focus,
   focusOnNav: shared.spark,
   spark: shared.spark,
+  sevCritical: t.sevCritical,
   sevCriticalTint: t.sevCriticalTint,
+  sevHigh: t.sevHigh,
   sevHighTint: t.sevHighTint,
+  sevMedium: t.sevMedium,
+  sevMediumTint: t.sevMediumTint,
+  sevLow: t.sevLow,
+  sevLowTint: t.sevLowTint,
   statusOperationalTint: t.statusOperationalTint,
 });
 

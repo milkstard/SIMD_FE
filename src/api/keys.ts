@@ -13,6 +13,12 @@ export const incidentKeys = {
   history: (incidentId: string) => [...incidentKeys.all, 'history', incidentId] as const,
 };
 
+export const applicationKeys = {
+  all: ['applications'] as const,
+  lists: () => [...applicationKeys.all, 'list'] as const,
+  list: (filters: Record<string, unknown>) => [...applicationKeys.lists(), filters] as const,
+};
+
 export const dashboardKeys = {
   all: ['dashboard'] as const,
   summaries: () => [...dashboardKeys.all, 'summary'] as const,

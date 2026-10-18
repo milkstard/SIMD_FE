@@ -24,10 +24,13 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | ID | Item | Source | Target |
 |---|---|---|---|
 | D-04 | Configurable sign-in help and privacy links (service desk link, Privacy / Accessibility footer, environment label) | 02_01 out of scope | Later spec (config-driven links) |
-| D-05 | UI behaviour for 403 / 409 / 429 / 500 (toasts, optimistic rollback, `Retry-After`) | 02_02 out of scope | The feature specs that use `apiRequest` |
+| D-05 | UI behaviour for 403 / 409 / 429 / 500 (toasts, optimistic rollback, `Retry-After`) | 02_02 out of scope | The feature specs that use `apiRequest` (05_01 delivers it for the report form's create mutation only) |
 | D-06 | `useCan` role checks | 02_02 out of scope | Later feature specs (needs D-01) |
 | D-08 | Saved-draft sentence in the Session expired note ("Your unsent report draft is still saved on this device.") | 02_02 decision (generic copy chosen) | Report form spec (draft saving) |
 | D-09 | Colour-scheme toggle (the theme follows the system setting for now) | 02_01 plan | Later spec (kept deferred in 03_01; Zustand UI state) |
 | D-12 | Role-based route guards (e.g. Admin-only screens) | 02_01 out of scope | FE-13 |
 | D-13 | Not-found page for unknown URLs and `404` API responses (until then the root `ErrorBoundary` shows "Page not found") | 03_01 out of scope | Later feature spec |
 | D-14 | ⌘K search / command palette in the top bar | 03_02 decision | Later spec |
+| D-17 | Rich-text editing for report description / steps (plain multi-line inputs in 05_01) | 05_01 out of scope | Later spec |
+| D-18 | Playwright E2E for the full report → close lifecycle | 05_01 out of scope | Cross-cutting E2E spec |
+| D-19 | Upgrade `react-router-dom` to v7 (npm audit: moderate advisories GHSA-wrjc-x8rr-h8h6, GHSA-337j-9hxr-rhxg; not reachable in this client-only SPA, in-app paths use a fixed prefix) | 05_01 security review | Dedicated upgrade task |
