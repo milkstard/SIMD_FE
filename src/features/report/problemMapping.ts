@@ -13,6 +13,11 @@ function readErrors(problem: ApiProblem | null): [string, string[]][] {
   ]);
 }
 
+/** Messages the 422 `errors` object holds for one key. */
+export function fieldMessages(problem: ApiProblem | null, key: string): string[] {
+  return readErrors(problem).find(([k]) => k === key)?.[1] ?? [];
+}
+
 /** Field names the 422 `errors` object refers to. */
 export function problemErrorKeys(problem: ApiProblem | null): string[] {
   return readErrors(problem).map(([key]) => key);

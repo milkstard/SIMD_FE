@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { server } from '@/test/msw/server';
+import { pendingAttachment } from '@/test/msw/fixtures';
 import { catalogApp, checkoutApp } from '@/test/msw/fixtures';
 import { mockAuth, renderAtReport } from '@/test/renderWithProviders';
 import { SEVERITIES } from '@/types/severity';
@@ -17,7 +18,7 @@ function setup() {
 }
 
 async function choose(user: ReturnType<typeof userEvent.setup>, field: RegExp, option: RegExp) {
-  await user.click(screen.getByRole('combobox', { name: field }));
+  await user.click(await screen.findByRole('combobox', { name: field }));
   await user.click(await screen.findByRole('option', { name: option }));
 }
 
@@ -96,6 +97,89 @@ describe('ReportIncidentForm', () => {
     await user.tab();
     expect(screen.getByRole('textbox', { name: /^steps to reproduce/i })).toHaveFocus();
     await user.tab();
+    expect(screen.getByRole('button', { name: 'Choose files' })).toHaveFocus();
+    await user.tab();
     expect(screen.getByRole('button', { name: 'Report incident' })).toHaveFocus();
+  });
+
+  describe('attachments', () => {
+    async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
+      await choose(user, /^application/i, /checkout/i);
+      await choose(user, /^environment/i, /^production$/i);
+      await user.click(screen.getByRole('radio', { name: /^high/i }));
+      await user.click(screen.getByRole('textbox', { name: /^title/i }));
+      await user.paste('Checkout fails after payment');
+      await user.click(screen.getByRole('textbox', { name: /^description/i }));
+      await user.paste('Users see an error page.');
+    }
+
+    const upload = (user: ReturnType<typeof userEvent.setup>, ...files: File[]) =>
+      user.upload(screen.getByLabelText('Attachment files'), files);
+    // The content doubles as the key the MSW handler reads, since the multipart file name is not reliable in jsdom.
+    const png = (name: string) => new File([name], name, { type: 'image/png' });
+
+    it('submits only the ids of uploaded, non-infected files', async () => {
+      const idByName: Record<string, string> = { 'good.png': 'id-good', 'bad.png': 'id-bad', 'gone.png': 'id-gone' };
+      let body: { attachmentIds?: string[] } | undefined;
+      server.use(
+        http.post('*/attachments', async ({ request }) => {
+          const file = (await request.formData()).get('file') as File;
+          const key = await file.text();
+          return HttpResponse.json(
+            {
+              ...pendingAttachment,
+              id: idByName[key],
+              fileName: key,
+              scanStatus: key === 'bad.png' ? 'Infected' : 'Pending',
+            },
+            { status: 201 },
+          );
+        }),
+        http.post('*/incidents', async ({ request }) => {
+          body = (await request.json()) as typeof body;
+          return HttpResponse.json({ number: 'INC-1042' }, { status: 201 });
+        }),
+      );
+      const user = userEvent.setup({ applyAccept: false });
+      renderAtReport(<ReportIncidentForm applications={[checkoutApp, catalogApp]} />);
+      await fillRequiredFields(user);
+
+      await upload(user, png('good.png'), png('bad.png'), png('gone.png'));
+      await screen.findByText('Infected');
+      await user.click(await screen.findByRole('button', { name: 'Remove gone.png' }));
+      await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+      expect(await screen.findByText('Incident page INC-1042')).toBeInTheDocument();
+      expect(body?.attachmentIds).toEqual(['id-good']);
+    }, 20_000);
+
+    it('blocks submit while an upload is running and clears the message when it finishes', async () => {
+      let requests = 0;
+      let release: () => void = () => {};
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      server.use(
+        http.post('*/attachments', async () => {
+          await gate;
+          return HttpResponse.json(pendingAttachment, { status: 201 });
+        }),
+        http.post('*/incidents', () => {
+          requests++;
+          return HttpResponse.json({ number: 'INC-1042' }, { status: 201 });
+        }),
+      );
+      const user = userEvent.setup({ applyAccept: false });
+      renderAtReport(<ReportIncidentForm applications={[checkoutApp, catalogApp]} />);
+      await fillRequiredFields(user);
+      await upload(user, png('slow.png'));
+      await screen.findByText('Uploading…');
+
+      await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+      expect(await screen.findByText('Wait for the uploads to finish.')).toBeInTheDocument();
+      expect(requests).toBe(0);
+      release();
+
+      await waitFor(() => expect(screen.queryByText('Wait for the uploads to finish.')).not.toBeInTheDocument());
+    }, 20_000);
   });
 });

@@ -23,3 +23,11 @@ export const createdIncident: components['schemas']['IncidentDetailDto'] = {
   status: 'New',
   rowVersion: 'AAAAAAAAB9E=',
 };
+
+export const pendingAttachment: components['schemas']['AttachmentDto'] = {
+  id: 'a91c0000-0000-4000-8000-000000000001',
+  fileName: 'screenshot.png',
+  contentType: 'image/png',
+  sizeBytes: 2048,
+  scanStatus: 'Pending',
+};

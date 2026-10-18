@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Box, Button, Link, Stack, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { ApiError } from '@/api/client';
 import { incidentPath, isIncidentNumber } from '@/shared/incidentPath';
 import { useToast } from '@/shared/toast/useToast';
 import { ApplicationFields } from './ApplicationFields';
+import { AttachmentDropzone } from './AttachmentDropzone';
 import { DescriptionFields } from './DescriptionFields';
 import { SeverityField } from './SeverityField';
 import { applyProblemErrors, getExistingIncidentNumber, problemErrorKeys } from './problemMapping';
@@ -22,6 +23,7 @@ import { useIdempotencyKey } from './useIdempotencyKey';
 import { useReportIncident } from './useReportIncident';
 
 const FALLBACK_ERROR = 'The incident could not be reported. Try again.';
+const WAIT_FOR_UPLOADS = 'Wait for the uploads to finish.';
 
 export function ReportIncidentForm({ applications }: { applications: Application[] }) {
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ export function ReportIncidentForm({ applications }: { applications: Application
   const inFlight = useRef(false);
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [duplicateNumber, setDuplicateNumber] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const { control, handleSubmit, setError, resetField } = useForm<
     ReportIncidentInput,
@@ -48,6 +51,12 @@ export function ReportIncidentForm({ applications }: { applications: Application
       attachmentIds: [],
     },
   });
+
+  // The "wait" message is only true while uploads run, so drop it as soon as they finish.
+  const handleUploadingChange = useCallback((pending: boolean) => {
+    setUploading(pending);
+    if (!pending) setFormErrors((errors) => errors.filter((message) => message !== WAIT_FOR_UPLOADS));
+  }, []);
 
   // Editing after a failed attempt starts a new attempt, so it gets a new idempotency key.
   const values = useWatch({ control });
@@ -88,6 +97,10 @@ export function ReportIncidentForm({ applications }: { applications: Application
 
   async function submit(values: ReportIncidentValues) {
     if (inFlight.current) return;
+    if (uploading) {
+      setFormErrors([WAIT_FOR_UPLOADS]);
+      return;
+    }
     inFlight.current = true;
     setFormErrors([]);
     setDuplicateNumber(null);
@@ -142,6 +155,7 @@ export function ReportIncidentForm({ applications }: { applications: Application
         <ApplicationFields control={control} resetField={resetField} applications={applications} />
         <SeverityField control={control} />
         <DescriptionFields control={control} />
+        <AttachmentDropzone control={control} onPendingChange={handleUploadingChange} />
         <Box>
           <Button type="submit" variant="contained" size="large" disabled={mutation.isPending}>
             {mutation.isPending ? 'Reporting…' : 'Report incident'}

@@ -34,3 +34,6 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-17 | Rich-text editing for report description / steps (plain multi-line inputs in 05_01) | 05_01 out of scope | Later spec |
 | D-18 | Playwright E2E for the full report → close lifecycle | 05_01 out of scope | Cross-cutting E2E spec |
 | D-19 | Upgrade `react-router-dom` to v7 (npm audit: moderate advisories GHSA-wrjc-x8rr-h8h6, GHSA-337j-9hxr-rhxg; not reachable in this client-only SPA, in-app paths use a fixed prefix) | 05_01 security review | Dedicated upgrade task |
+| D-20 | Polling or live refresh of attachment scan status after upload | 05_02 out of scope | Later spec |
+| D-21 | Downloading attachments | 05_02 out of scope | FE-07 (incident detail) |
+| D-22 | Attachments on comments | 05_02 out of scope | Comments spec |
