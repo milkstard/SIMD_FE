@@ -110,11 +110,15 @@ The task focuses on frontend flows that interact with the backend.
 
 Report findings first, organized by severity. Include recommended fixes and any areas requiring backend verification.
 
+Before the summary, give the counts the quality gate reports: **Blocking findings:** [count of actionable issues, Medium and above or anything that must be fixed] and **Non-blocking findings:** [count of Low and Informational items].
+
 End with a **Security Summary** of 1–5 sentences maximum.
 
 - If no actionable security issues are found, the final summary must contain the exact phrase: **Security Clear**.
 - If issues are found, summarize the most important findings, their severity, and the necessary next steps in 1–5 sentences.
 - If the review is incomplete, explicitly disclose the limitations. Do not use "Security Clear" to imply that unreviewed flows or unavailable backend controls have been verified.
 - Distinguish "no issues found in the reviewed scope" from proof that the entire application is secure.
+
+Finish with one last line, read by the quality gate: `Verdict: Pass`, `Verdict: Fail` or `Verdict: Incomplete`. Pass only when the summary says **Security Clear**; Fail when an actionable issue remains; Incomplete when the review could not cover the scope.
 
 Do not modify any code. Your output is a security assessment with actionable recommendations only.

@@ -97,3 +97,5 @@ List findings ordered by severity (**Blocking**, **Should fix**, **Nit**). For e
 ### Summary
 
 End with a concise summary of **1–5 sentences maximum** covering what was reviewed, the most important findings, `/frontend` skill compliance, and whether the changes are ready to merge. Disclose anything you could not review.
+
+Finish with one last line, read by the quality gate: `Verdict: Pass`, `Verdict: Fail` or `Verdict: Incomplete`. Pass when there are no Blocking issues; Fail when any Blocking issue remains; Incomplete when you could not review the full scope.

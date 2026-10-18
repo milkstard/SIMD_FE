@@ -101,7 +101,26 @@ If the senior reviewer identifies actionable issues, report them and mark the qu
 
 ## 5. Final Report
 
-Always provide a concise orchestration report.
+Always start the report with this result box, filled in from the agents' actual reports (their `Verdict:` lines). Use ✅ Pass, ❌ Fail, ⚠️ Incomplete, or ⏸ Not run / Blocked (add the reason below the box):
+
+```
+┌──────────────────── QUALITY GATE · <spec id> ────────────────────┐
+│  QA            <✅ Pass | ❌ Fail | ⚠️ Incomplete>                  │
+│                tests <n> passed / <n> failed · criteria <n>/<n> met │
+│  Security      <✅ Pass | ❌ Fail | ⚠️ Incomplete>                  │
+│                <n> blocking · <n> non-blocking findings            │
+│  Code review   <✅ Pass | ❌ Fail | ⏸ Not run/Blocked>             │
+│                <n> blocking · <n> non-blocking findings            │
+│  ──────────────────────────────────────────────────────────────  │
+│  OVERALL       <✅ PASSED | ❌ FAILED | ⚠️ INCOMPLETE>             │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+The second line of each row holds the counts from the agent's report: QA = test cases passed and failed plus acceptance criteria covered by passing tests out of the spec's total; Security and Code review = blocking and non-blocking findings. Use `n/a` for a count the agent could not give (and for a stage that was not run), never a guess.
+
+OVERALL is PASSED only when all three rows are Pass. Any Fail makes it FAILED; otherwise any Incomplete, Blocked or Not run makes it INCOMPLETE. If an agent's report has no `Verdict:` line, treat that row as Incomplete rather than guessing.
+
+Then provide a concise orchestration report below the box.
 
 Include:
 

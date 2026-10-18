@@ -98,6 +98,7 @@ Always finish with the following report.
 - **Tests failed:** [count]
 - **Tests skipped:** [count]
 - **Tests not executed / unverified:** [count, if applicable]
+- **Acceptance criteria covered by passing tests:** [n of N]
 - **Tests added:** 0
 - **New tests proposed:** [count]
 - **Blocking issues:** [count]
@@ -115,3 +116,5 @@ List the failures, evidence-based root causes, recommended fixes, and missing te
 End with a concise summary of **1–5 sentences maximum** covering what was tested, the outcome, the most important findings, and whether the specification's acceptance criteria appear satisfied.
 
 Clearly disclose any unexecuted tests, unresolved blockers, or important coverage gaps. Never claim full validation without sufficient evidence.
+
+Finish with one last line, read by the quality gate: `Verdict: Pass`, `Verdict: Fail` or `Verdict: Incomplete`. Pass only when the relevant checks ran, no test fails and no acceptance criterion is uncovered; Incomplete when something that matters could not be run.
