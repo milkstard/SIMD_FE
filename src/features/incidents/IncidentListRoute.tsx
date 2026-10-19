@@ -1,12 +1,15 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { EmptyState } from '@/shared/EmptyState';
+import { FilterBar } from './FilterBar';
+import { useIncidentFilterStore } from './incidentFilterStore';
 import { IncidentListSkeleton } from './IncidentListSkeleton';
 import { IncidentRows } from './IncidentRows';
+import { SavedViewTabs } from './SavedViewTabs';
 import { useIncidents } from './useIncidents';
 
 function IncidentListBody() {
-  // Filters arrive with the filter bar and its store in FE-06.02.
-  const list = useIncidents({});
+  const filters = useIncidentFilterStore((s) => s.filters);
+  const list = useIncidents(filters);
   const { rows, isError, isFetching, isFetchNextPageError } = list;
 
   if (list.isPending) return <IncidentListSkeleton />;
@@ -60,6 +63,8 @@ export default function IncidentListRoute() {
       <Typography variant="titlePage" component="h1">
         Incidents
       </Typography>
+      <SavedViewTabs />
+      <FilterBar />
       <IncidentListBody />
     </Stack>
   );

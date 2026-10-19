@@ -3,7 +3,7 @@ import { EmptyState } from '@/shared/EmptyState';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { ReportFormSkeleton } from './ReportFormSkeleton';
 import { ReportIncidentForm } from './ReportIncidentForm';
-import { useApplications } from './useApplications';
+import { useApplications } from '@/shared/hooks/useApplications';
 
 function ReportBody() {
   const { data, isPending, isError, refetch, isFetching } = useApplications();

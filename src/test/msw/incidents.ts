@@ -1,6 +1,6 @@
 import { http, HttpResponse, type RequestHandler } from 'msw';
 import { config } from '@/app/config';
-import { listIncidents } from './fixtures';
+import { currentUser, listIncidents } from './fixtures';
 
 const api = (path: string) => `*${config.apiBaseUrl}${path}`;
 const CURSOR = /^offset:(\d+)$/;
@@ -9,7 +9,7 @@ const problem = (status: number, title: string) =>
   HttpResponse.json({ title, status }, { status, headers: { 'content-type': 'application/problem+json' } });
 
 /**
- * `GET /incidents` over the fixture list: repeated status/severity, assigneeId, slaBreached and q filters,
+ * `GET /incidents` over the fixture list: repeated status/severity, assigneeId (`me`, `unassigned`, id), applicationId, teamId, slaBreached and q filters,
  * cursor paging (`offset:N`) and the contract's 422s.
  */
 export const incidentHandlers: RequestHandler[] = [
@@ -28,12 +28,19 @@ export const incidentHandlers: RequestHandler[] = [
     const severities = params.getAll('severity');
     const q = params.get('q')?.toLowerCase();
     const assigneeId = params.get('assigneeId');
+    const applicationId = params.get('applicationId');
+    const teamId = params.get('teamId');
     const matches = listIncidents.filter(
       (incident) =>
         (statuses.length === 0 || statuses.includes(incident.status ?? '')) &&
         (severities.length === 0 || severities.includes(incident.severity ?? '')) &&
         (params.get('slaBreached') !== 'true' || incident.isSlaBreached) &&
-        (assigneeId === null || incident.assignee?.id === assigneeId) &&
+        (assigneeId === null ||
+          (assigneeId === 'unassigned' && !incident.assignee) ||
+          (assigneeId === 'me' && incident.assignee?.id === currentUser.id) ||
+          incident.assignee?.id === assigneeId) &&
+        (applicationId === null || incident.application?.id === applicationId) &&
+        (teamId === null || incident.assignedTeam?.id === teamId) &&
         (!q || incident.title?.toLowerCase().includes(q)),
     );
 

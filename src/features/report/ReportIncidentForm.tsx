@@ -19,7 +19,7 @@ import {
   type ReportIncidentInput,
   type ReportIncidentValues,
 } from './reportIncident.schema';
-import type { Application } from './useApplications';
+import type { Application } from '@/shared/hooks/useApplications';
 import { handleSubmitError } from './reportSubmitError';
 import { useIdempotencyKey } from './useIdempotencyKey';
 import { useReportDraft } from './useReportDraft';

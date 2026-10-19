@@ -2,7 +2,7 @@ import { MenuItem, Stack, TextField } from '@mui/material';
 import { Controller, useWatch, type UseFormResetField } from 'react-hook-form';
 import type { ReportIncidentInput } from './reportIncident.schema';
 import type { ReportControl } from './reportFormTypes';
-import type { Application } from './useApplications';
+import type { Application } from '@/shared/hooks/useApplications';
 
 interface ApplicationFieldsProps {
   control: ReportControl;

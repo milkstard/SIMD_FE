@@ -41,3 +41,6 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-28 | Multiple concurrent report drafts per user | 05_04 out of scope | Later spec |
 | D-29 | A true "SLA at risk" server filter (the API offers `slaBreached` only) | 06_01 / 06_02 out of scope | Needs a backend change, then a later spec |
 | D-30 | Opening an incident from a list row beyond the number link | 06_01 out of scope | FE-07 (incident detail) |
+| D-31 | User-defined or persisted saved views | 06_02 out of scope | Later spec |
+| D-32 | Date-range and reporter filters on the incident list | 06_02 out of scope | Later spec |
+| D-33 | Session teardown on sign-out / account switch: reset `useIncidentFilterStore`, call `queryClient.clear()` (drops the `/me` cache, `staleTime: Infinity`) and clear the per-user report drafts | 06_02 / 05_04 security and code review | User menu / sign-out spec (not yet written; no FE-NN covers logout, FE-03 has only the avatar) |

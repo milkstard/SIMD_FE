@@ -11,7 +11,7 @@ import {
   type ReportIncidentInput,
 } from './reportIncident.schema';
 import { readDraft, removeDraft, writeDraft } from './reportDraftStorage';
-import type { Application } from './useApplications';
+import type { Application } from '@/shared/hooks/useApplications';
 
 const SAVE_DELAY_MS = 500;
 
