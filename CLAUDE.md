@@ -38,7 +38,8 @@ npm run dev            # Vite dev server (proxies /api and /hubs to the backend)
 npm run build          # type-check + production build
 npm run typecheck      # tsc --noEmit
 npm run lint           # ESLint
-npm run test           # Vitest
+npm run test           # Vitest (jsdom, `unit` project)
+npm run test:browser   # Vitest browser mode (real Chromium; needs `npx playwright install chromium`) for what jsdom can't show, e.g. grid virtualization
 npm run test:e2e       # Playwright (needs backend running)
 npm run gen:api        # regenerate src/api/generated/ from ../SIMD_BE/contracts/swagger.json
 ```

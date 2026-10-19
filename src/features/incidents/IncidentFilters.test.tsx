@@ -28,7 +28,7 @@ function spyOnIncidents() {
 async function renderList() {
   const spy = spyOnIncidents();
   const rendered = renderAtIncidents(<IncidentListRoute />);
-  await screen.findByRole('list', { name: 'Incidents' });
+  await screen.findByRole('grid', { name: 'Incidents' });
   return { ...spy, ...rendered, user: userEvent.setup() };
 }
 
@@ -253,7 +253,7 @@ describe('SavedViewTabs', { timeout: 20_000 }, () => {
     });
     // Server data stays in TanStack Query: nothing but filters in the store.
     expect(Object.keys(useIncidentFilterStore.getState()).sort()).toEqual(
-      ['activeViewId', 'applyView', 'filters', 'reset', 'resetKey', 'setFilter'],
+      ['activeViewId', 'applyView', 'filters', 'reset', 'resetKey', 'setFilter', 'setSort'],
     );
     expect(queryClient.getQueryCache().getAll().length).toBeGreaterThan(0);
   });

@@ -8,28 +8,19 @@ import IncidentListRoute from './IncidentListRoute';
 beforeEach(mockAuth);
 afterEach(() => vi.restoreAllMocks());
 
-describe('IncidentListRoute', () => {
-  it('shows a skeleton, then the incidents with links, severity and status', async () => {
+// jsdom has no layout, so the grid never reports a scroll position: paging on scroll is covered in
+// IncidentList.browser.test.tsx. Grid rendering is also slow under full-suite load.
+describe('IncidentListRoute', { timeout: 20_000 }, () => {
+  it('shows a skeleton, then the grid with links, severity and status', async () => {
     renderAtIncidents(<IncidentListRoute />);
 
     expect(screen.getByRole('status', { name: /loading incidents/i })).toBeInTheDocument();
-    const list = await screen.findByRole('list', { name: 'Incidents' });
-    expect(within(list).getAllByRole('listitem')).toHaveLength(50);
-    expect(within(list).getByRole('link', { name: 'INC-3001' })).toHaveAttribute(
+    const grid = await screen.findByRole('grid', { name: 'Incidents' });
+    expect(await within(grid).findByRole('link', { name: 'INC-3001' })).toHaveAttribute(
       'href',
       '/incidents/INC-3001',
     );
-    expect(within(list).getAllByText('Critical').length).toBeGreaterThan(0);
-  });
-
-  it('loads the next page with "Load more" and then hides the button', async () => {
-    renderAtIncidents(<IncidentListRoute />);
-    const user = userEvent.setup();
-
-    await user.click(await screen.findByRole('button', { name: 'Load more' }));
-
-    expect(await screen.findByRole('link', { name: 'INC-3060' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Load more' })).not.toBeInTheDocument();
+    expect(within(grid).getAllByText('Critical').length).toBeGreaterThan(0);
   });
 
   it('shows an empty state when nothing is returned', async () => {
@@ -46,38 +37,12 @@ describe('IncidentListRoute', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
 
-    expect(await screen.findByRole('list', { name: 'Incidents' })).toBeInTheDocument();
-  });
-
-  it('keeps the rows and offers Retry when the next page fails', async () => {
-    server.use(
-      http.get(
-        '*/incidents',
-        ({ request }) =>
-          new URL(request.url).searchParams.has('cursor')
-            ? new HttpResponse(null, { status: 500 })
-            : undefined,
-        { once: false },
-      ),
-    );
-    renderAtIncidents(<IncidentListRoute />);
-    const user = userEvent.setup();
-
-    await user.click(await screen.findByRole('button', { name: 'Load more' }));
-
-    expect(await screen.findByText('The next incidents could not be loaded.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'INC-3001' })).toBeInTheDocument();
-
-    server.resetHandlers();
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-
-    expect(await screen.findByRole('link', { name: 'INC-3060' })).toBeInTheDocument();
-    expect(screen.queryByText('The next incidents could not be loaded.')).not.toBeInTheDocument();
+    expect(await screen.findByRole('grid', { name: 'Incidents' })).toBeInTheDocument();
   });
 
   it('keeps the rows and shows a retry when a refresh fails', async () => {
     const { queryClient } = renderAtIncidents(<IncidentListRoute />);
-    await screen.findByRole('list', { name: 'Incidents' });
+    await screen.findByRole('grid', { name: 'Incidents' });
 
     server.use(http.get('*/incidents', () => new HttpResponse(null, { status: 500 })));
     await act(() => queryClient.invalidateQueries());
@@ -91,5 +56,24 @@ describe('IncidentListRoute', () => {
     await waitFor(() =>
       expect(screen.queryByText('The incidents could not be refreshed.')).not.toBeInTheDocument(),
     );
+  });
+
+  it('sorts on the server from the Severity header and returns to the default order', async () => {
+    const sorts: (string | null)[] = [];
+    server.use(
+      http.get('*/incidents', ({ request }) => {
+        sorts.push(new URL(request.url).searchParams.get('sort'));
+        return undefined;
+      }),
+    );
+    renderAtIncidents(<IncidentListRoute />);
+    const user = userEvent.setup();
+    await screen.findByRole('grid', { name: 'Incidents' });
+
+    await user.click(screen.getByRole('columnheader', { name: /severity/i }));
+    await waitFor(() => expect(sorts).toContain('severity'));
+
+    await user.click(screen.getByRole('columnheader', { name: /severity/i }));
+    await waitFor(() => expect(sorts[sorts.length - 1]).toBe('-createdAt'));
   });
 });

@@ -81,6 +81,8 @@ describe('IncidentUpdated', () => {
     const infinite = queryClient.getQueryData<InfiniteData<Paged>>(incidentKeys.list({ a: 2 }));
     expect(infinite?.pages[0].items?.[0].title).toBe('New title');
     expect(infinite?.pages[1].items).toEqual([other]);
+    // Unrelated items keep their object identity, so the grid can skip re-rendering their rows.
+    expect(infinite?.pages[1].items?.[0]).toBe(other);
   });
 
   it('ignores an event older than the cached incident', () => {

@@ -53,7 +53,15 @@ export const currentUser: components['schemas']['CurrentUserDto'] = {
 };
 
 const listSeverities = ['Critical', 'High', 'Medium', 'Low'] as const;
-const listStatuses = ['New', 'Triaged', 'InProgress', 'OnHold', 'Resolved', 'Reopened', 'Closed'] as const;
+const listStatuses = [
+  'New',
+  'Triaged',
+  'InProgress',
+  'OnHold',
+  'Resolved',
+  'Reopened',
+  'Closed',
+] as const;
 
 /** Deterministic list row `index` (0-based): number INC-3001, INC-3002, ... newest first. */
 export function incidentSummary(index: number): components['schemas']['IncidentSummaryDto'] {
@@ -64,10 +72,24 @@ export function incidentSummary(index: number): components['schemas']['IncidentS
     severity: listSeverities[index % listSeverities.length],
     status: listStatuses[index % listStatuses.length],
     isSlaBreached: index % 5 === 0,
+    application:
+      index % 2 === 0
+        ? { id: checkoutApp.id, name: checkoutApp.name, code: checkoutApp.code }
+        : { id: catalogApp.id, name: catalogApp.name, code: catalogApp.code },
+    assignee:
+      index % 3 === 0
+        ? undefined
+        : { id: currentUser.id, displayName: currentUser.displayName, email: currentUser.email },
     createdAt: new Date(Date.UTC(2026, 9, 18, 12, 0, 0) - index * 60_000).toISOString(),
     updatedAt: new Date(Date.UTC(2026, 9, 18, 12, 0, 0) - index * 60_000).toISOString(),
   };
 }
 
 export const LIST_TOTAL = 60;
-export const listIncidents = Array.from({ length: LIST_TOTAL }, (_, index) => incidentSummary(index));
+export const listIncidents = Array.from({ length: LIST_TOTAL }, (_, index) =>
+  incidentSummary(index),
+);
+
+/** `count` deterministic rows (INC-3001 ...) for tests that need more than the default list. */
+export const manyIncidents = (count: number) =>
+  Array.from({ length: count }, (_, index) => incidentSummary(index));

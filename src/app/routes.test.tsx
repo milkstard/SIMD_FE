@@ -21,7 +21,8 @@ function renderAt(path: string) {
   );
 }
 
-describe('routes', () => {
+// The /incidents chunk pulls in the DataGrid, whose cold import is slow.
+describe('routes', { timeout: 20_000 }, () => {
   it.each([
     ['/', 'Monitor'],
     ['/incidents', 'Incidents'],
@@ -30,7 +31,9 @@ describe('routes', () => {
     ['/admin/teams', 'Admin'],
   ])('%s renders the %s screen', async (path, heading) => {
     renderAt(path);
-    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: heading }, { timeout: 10_000 }),
+    ).toBeInTheDocument();
   });
 
   it('gives the root and every top-level route its own error boundary', () => {

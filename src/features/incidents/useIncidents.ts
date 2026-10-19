@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { apiRequest } from '@/api/client';
 import type { components } from '@/api/generated/schema';
 import { incidentKeys } from '@/api/keys';
@@ -27,7 +28,9 @@ export function useIncidents(filters: IncidentFilters) {
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
-  const rows = query.data?.pages.flatMap((page) => page.items ?? []) ?? [];
+  // Same array while the cache entry is unchanged: the grid diffs `rows` by reference, so a new array on every
+  // render would re-render every row after a live patch (measured in IncidentList.live.test.tsx).
+  const rows = useMemo(() => query.data?.pages.flatMap((page) => page.items ?? []) ?? [], [query.data]);
 
   return { ...query, rows };
 }

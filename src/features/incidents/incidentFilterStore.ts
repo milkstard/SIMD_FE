@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { IncidentFilters } from './incidentFilters';
+import type { IncidentFilters, IncidentSort } from './incidentFilters';
 import type { SavedViewId } from './savedViews';
 
 interface IncidentFilterState {
@@ -9,6 +9,8 @@ interface IncidentFilterState {
   resetKey: number;
   /** Editing a filter leaves any saved view. */
   setFilter: <K extends keyof IncidentFilters>(key: K, value: IncidentFilters[K]) => void;
+  /** The sort is not part of a view, so changing it keeps the active view. */
+  setSort: (sort: IncidentSort) => void;
   /** Replaces the filters with the view's; the sort is not part of a view and is kept. */
   applyView: (id: SavedViewId, filters: IncidentFilters) => void;
   reset: () => void;
@@ -21,6 +23,7 @@ export const useIncidentFilterStore = create<IncidentFilterState>((set) => ({
   resetKey: 0,
   setFilter: (key, value) =>
     set((state) => ({ filters: { ...state.filters, [key]: value }, activeViewId: null })),
+  setSort: (sort) => set((state) => ({ filters: { ...state.filters, sort } })),
   applyView: (id, filters) =>
     set((state) => ({
       filters: { ...filters, sort: state.filters.sort },

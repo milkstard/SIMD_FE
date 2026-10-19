@@ -50,4 +50,15 @@ describe('incidentFilterStore', () => {
     store.getState().reset();
     expect(store.getState().resetKey).toBe(start + 2);
   });
+
+  it('setSort changes the sort and keeps the active view and the filters', () => {
+    store.getState().applyView('mine', { assignee: 'me' });
+    const key = store.getState().resetKey;
+
+    store.getState().setSort('severity');
+
+    expect(store.getState().filters).toEqual({ assignee: 'me', sort: 'severity' });
+    expect(store.getState().activeViewId).toBe('mine');
+    expect(store.getState().resetKey).toBe(key);
+  });
 });

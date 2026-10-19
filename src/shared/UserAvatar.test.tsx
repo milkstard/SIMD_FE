@@ -31,4 +31,14 @@ describe('UserAvatar', () => {
     renderAvatar(null);
     expect(screen.getByRole('img', { name: 'Signed-in user' })).toBeInTheDocument();
   });
+
+  it('hides the decorative variant from assistive tech', () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <UserAvatar name="Ana Reyes" decorative />
+      </ThemeProvider>,
+    );
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByText('AR')).toHaveAttribute('aria-hidden', 'true');
+  });
 });

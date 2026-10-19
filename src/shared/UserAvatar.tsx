@@ -3,6 +3,8 @@ import { Avatar, Tooltip } from '@mui/material';
 
 interface UserAvatarProps {
   name?: string | null;
+  /** Hidden from assistive tech, for use beside the visible name. */
+  decorative?: boolean;
 }
 
 /** Up to two letters: first and last word of a name, or of an email's local part. */
@@ -23,7 +25,14 @@ const avatarSx = {
   color: 'text.primary',
 } as const;
 
-export function UserAvatar({ name }: UserAvatarProps) {
+export function UserAvatar({ name, decorative = false }: UserAvatarProps) {
+  if (decorative && name) {
+    return (
+      <Avatar aria-hidden sx={avatarSx}>
+        {initials(name)}
+      </Avatar>
+    );
+  }
   if (!name) {
     return (
       <Avatar role="img" aria-label="Signed-in user" sx={avatarSx}>

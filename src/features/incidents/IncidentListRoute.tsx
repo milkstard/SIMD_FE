@@ -1,14 +1,16 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { EmptyState } from '@/shared/EmptyState';
 import { FilterBar } from './FilterBar';
+import { DEFAULT_SORT } from './incidentFilters';
 import { useIncidentFilterStore } from './incidentFilterStore';
+import { IncidentList } from './IncidentList';
 import { IncidentListSkeleton } from './IncidentListSkeleton';
-import { IncidentRows } from './IncidentRows';
 import { SavedViewTabs } from './SavedViewTabs';
 import { useIncidents } from './useIncidents';
 
 function IncidentListBody() {
   const filters = useIncidentFilterStore((s) => s.filters);
+  const setSort = useIncidentFilterStore((s) => s.setSort);
   const list = useIncidents(filters);
   const { rows, isError, isFetching, isFetchNextPageError } = list;
 
@@ -46,12 +48,14 @@ function IncidentListBody() {
           The incidents could not be refreshed.
         </Alert>
       )}
-      <IncidentRows
+      <IncidentList
         rows={rows}
         hasNextPage={list.hasNextPage}
         isFetchingNextPage={list.isFetchingNextPage}
         isFetchNextPageError={isFetchNextPageError}
-        onLoadMore={() => void list.fetchNextPage()}
+        onLoadMore={() => void list.fetchNextPage({ cancelRefetch: false })}
+        sort={filters.sort ?? DEFAULT_SORT}
+        onSortChange={setSort}
       />
     </Stack>
   );

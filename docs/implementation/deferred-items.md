@@ -28,7 +28,7 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-13 | Not-found page for unknown URLs and `404` API responses (until then the root `ErrorBoundary` shows "Page not found") | 03_01 out of scope | Later feature spec |
 | D-14 | ⌘K search / command palette in the top bar | 03_02 decision | Later spec |
 | D-17 | Rich-text editing for report description / steps (plain multi-line inputs in 05_01) | 05_01 out of scope | Later spec |
-| D-18 | Playwright E2E for the full report → close lifecycle | 05_01 out of scope | Cross-cutting E2E spec |
+| D-18 | Playwright E2E for the full report → close lifecycle (also: a second context's `IncidentUpdated` reaches the incident grid, from 06_03) | 05_01 out of scope | Cross-cutting E2E spec |
 | D-19 | Upgrade `react-router-dom` to v7 (npm audit: moderate advisories GHSA-wrjc-x8rr-h8h6, GHSA-337j-9hxr-rhxg; not reachable in this client-only SPA, in-app paths use a fixed prefix) | 05_01 security review | Dedicated upgrade task |
 | D-20 | Polling or live refresh of attachment scan status after upload | 05_02 out of scope | Later spec |
 | D-21 | Downloading attachments | 05_02 out of scope | FE-07 (incident detail) |
@@ -44,3 +44,6 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-31 | User-defined or persisted saved views | 06_02 out of scope | Later spec |
 | D-32 | Date-range and reporter filters on the incident list | 06_02 out of scope | Later spec |
 | D-33 | Session teardown on sign-out / account switch: reset `useIncidentFilterStore`, call `queryClient.clear()` (drops the `/me` cache, `staleTime: Infinity`) and clear the per-user report drafts | 06_02 / 05_04 security and code review | User menu / sign-out spec (not yet written; no FE-NN covers logout, FE-03 has only the avatar) |
+| D-34 | Bulk actions and row selection on the incident list | 06_03 out of scope | Later spec |
+| D-35 | Column resizing/ordering and persisting it | 06_03 out of scope | Later spec |
+| D-36 | CSV export of the incident list | 06_03 out of scope | FE-14 |
