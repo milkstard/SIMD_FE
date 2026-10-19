@@ -38,3 +38,21 @@ export function renderAtReport(ui: ReactElement) {
     </ThemeProvider>,
   );
 }
+
+/** Renders `ui` at `/incidents` inside router, query client and theme; `/incidents/:number` is a stub. */
+export function renderAtIncidents(ui: ReactElement) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const result = render(
+    <ThemeProvider theme={theme}>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/incidents']}>
+          <Routes>
+            <Route path="/incidents" element={ui} />
+            <Route path="/incidents/:number" element={<DetailStub />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    </ThemeProvider>,
+  );
+  return { ...result, queryClient };
+}

@@ -39,3 +39,5 @@ Ledger of work that the specs in `docs/specs/` push to a later phase.
 | D-26 | Syncing report drafts across devices or tabs | 05_04 out of scope | Later spec |
 | D-27 | Restoring uploaded attachments from a saved draft | 05_04 out of scope | Later spec |
 | D-28 | Multiple concurrent report drafts per user | 05_04 out of scope | Later spec |
+| D-29 | A true "SLA at risk" server filter (the API offers `slaBreached` only) | 06_01 / 06_02 out of scope | Needs a backend change, then a later spec |
+| D-30 | Opening an incident from a list row beyond the number link | 06_01 out of scope | FE-07 (incident detail) |

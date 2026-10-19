@@ -51,3 +51,23 @@ export const currentUser: components['schemas']['CurrentUserDto'] = {
   roles: ['Responder'],
   teamIds: ['7ea40000-0000-4000-8000-000000000001'],
 };
+
+const listSeverities = ['Critical', 'High', 'Medium', 'Low'] as const;
+const listStatuses = ['New', 'Triaged', 'InProgress', 'OnHold', 'Resolved', 'Reopened', 'Closed'] as const;
+
+/** Deterministic list row `index` (0-based): number INC-3001, INC-3002, ... newest first. */
+export function incidentSummary(index: number): components['schemas']['IncidentSummaryDto'] {
+  return {
+    id: `1c1d0000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+    number: `INC-${3001 + index}`,
+    title: `List incident ${index + 1}`,
+    severity: listSeverities[index % listSeverities.length],
+    status: listStatuses[index % listStatuses.length],
+    isSlaBreached: index % 5 === 0,
+    createdAt: new Date(Date.UTC(2026, 9, 18, 12, 0, 0) - index * 60_000).toISOString(),
+    updatedAt: new Date(Date.UTC(2026, 9, 18, 12, 0, 0) - index * 60_000).toISOString(),
+  };
+}
+
+export const LIST_TOTAL = 60;
+export const listIncidents = Array.from({ length: LIST_TOTAL }, (_, index) => incidentSummary(index));

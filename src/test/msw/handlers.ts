@@ -1,5 +1,6 @@
 import { http, HttpResponse, type RequestHandler } from 'msw';
 import { config } from '@/app/config';
+import { incidentHandlers } from './incidents';
 import { catalogApp, checkoutApp, createdIncident, currentUser, pendingAttachment } from './fixtures';
 
 // Wildcard origin: this module also loads in the node test environment, where `window` is undefined.
@@ -12,6 +13,7 @@ export const handlers: RequestHandler[] = [
     HttpResponse.json({ items: [checkoutApp, catalogApp], nextCursor: null, totalCount: null }),
   ),
   http.get(api('/incidents/similar'), () => HttpResponse.json([])),
+  ...incidentHandlers,
   http.post(api('/incidents'), () => HttpResponse.json(createdIncident, { status: 201 })),
   http.post(api('/attachments'), async ({ request }) => {
     const file = (await request.formData()).get('file');
