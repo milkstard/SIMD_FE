@@ -6,10 +6,12 @@ import { SignInCard, type SignInState } from './SignInCard';
 interface SignInPageProps {
   state: SignInState;
   error?: AuthError | null;
+  /** Expired state only: an unsent report draft is saved on this device. */
+  hasDraft?: boolean;
   onSignIn?: () => void;
 }
 
-export function SignInPage({ state, error = null, onSignIn }: SignInPageProps) {
+export function SignInPage({ state, error = null, hasDraft = false, onSignIn }: SignInPageProps) {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexWrap: 'wrap', bgcolor: 'background.default' }}>
       <BrandPanel />
@@ -39,7 +41,7 @@ export function SignInPage({ state, error = null, onSignIn }: SignInPageProps) {
             gap: 5,
           }}
         >
-          <SignInCard state={state} error={error} onSignIn={onSignIn} />
+          <SignInCard state={state} error={error} hasDraft={hasDraft} onSignIn={onSignIn} />
           <Box
             sx={{
               borderTop: 1,

@@ -35,6 +35,33 @@ export const reportIncidentSchema = z.object({
     .default([]),
 });
 
+/**
+ * What a saved draft may contain: the same types, enums and maximums as the form, but no minimums,
+ * because a half-written report is exactly what a draft is. Files and `attachmentIds` are never saved.
+ */
+export const reportDraftSchema = z
+  .object({
+    applicationId: z.string().max(100),
+    environment: z.enum(ENVIRONMENTS),
+    severity: z.enum(SEVERITIES),
+    title: z.string().max(TITLE_MAX),
+    description: z.string().max(DESCRIPTION_MAX),
+    stepsToReproduce: z.string().max(STEPS_MAX),
+  })
+  .partial();
+
+export type ReportDraft = z.infer<typeof reportDraftSchema>;
+
+export const reportDraftFields = Object.keys(reportDraftSchema.shape) as (keyof ReportDraft)[];
+
+export const REPORT_DEFAULTS: Partial<ReportIncidentInput> = {
+  applicationId: '',
+  title: '',
+  description: '',
+  stepsToReproduce: '',
+  attachmentIds: [],
+};
+
 export type ReportIncidentInput = z.input<typeof reportIncidentSchema>;
 export type ReportIncidentValues = z.output<typeof reportIncidentSchema>;
 

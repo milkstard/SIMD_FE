@@ -58,4 +58,21 @@ describe('ReportRoute', () => {
     expect(await screen.findByRole('option', { name: /second app/i })).toBeInTheDocument();
     expect(cursors).toEqual([null, 'page-2']);
   });
+
+  it('keeps the skeleton while /me is pending', async () => {
+    server.use(http.get('*/me', () => new Promise<Response>(() => undefined)));
+    renderAtReport(<ReportRoute />);
+    await screen.findByRole('status', { name: /loading the report form/i });
+    await new Promise((resolve) => setTimeout(resolve, 300)); // applications have loaded by now
+
+    expect(screen.getByRole('status', { name: /loading the report form/i })).toBeInTheDocument();
+    expect(screen.queryByRole('form', { name: /report an incident/i })).not.toBeInTheDocument();
+  });
+
+  it('still shows the form when /me fails', async () => {
+    server.use(http.get('*/me', () => new HttpResponse(null, { status: 500 })));
+    renderAtReport(<ReportRoute />);
+
+    expect(await screen.findByRole('form', { name: /report an incident/i })).toBeInTheDocument();
+  });
 });

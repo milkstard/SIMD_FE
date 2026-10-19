@@ -4,11 +4,13 @@ import { Box, Button, IconButton } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useConnectionState } from '@/realtime';
 import { ConnectionBanner } from '@/shared/ConnectionBanner';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { UserAvatar } from '@/shared/UserAvatar';
 
 export function TopBar() {
   const { instance, accounts } = useMsal();
-  // useCurrentUser() is blocked on BE-11 (D-01), so the name comes from the MSAL account for now.
+  // Loading /me here keeps it in the cache for the whole session (the expired-session note reads it).
+  const { data: user } = useCurrentUser();
   const account = instance.getActiveAccount() ?? accounts[0];
   const connection = useConnectionState();
 
@@ -35,7 +37,7 @@ export function TopBar() {
       <IconButton aria-label="Notifications" sx={{ width: 44, height: 44 }}>
         <NotificationsNoneOutlined />
       </IconButton>
-      <UserAvatar name={account?.name ?? account?.username} />
+      <UserAvatar name={user?.displayName ?? account?.name ?? account?.username} />
     </Box>
   );
 }

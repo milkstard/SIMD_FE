@@ -11,3 +11,7 @@ Items that were listed in `docs/implementation/deferred-items.md` and have since
 | D-11 | App shell, nav rail, top bar (routes + `ErrorBoundary` delivered in 03_01) | 02_01 out of scope | 03_02 | 2026-10-11 |
 | D-07 | SignalR `accessTokenFactory` | 02_01 and 02_02 out of scope | 04_01 | 2026-10-12 |
 | D-15 | Offline banner copy "Refreshing every 30 seconds until the connection returns." (30 s polling fallback) | 03_02 decision | 04_01 | 2026-10-12 |
+| D-01 | `useCurrentUser()` in `src/shared/hooks/useCurrentUser.ts` (`meKeys.current()`, generated `CurrentUserDto`) | 02_02 | 05_04 | 2026-10-19 |
+| D-02 | `GET /api/v1/me` MSW handler | 02_02 | 05_04 | 2026-10-19 |
+| D-03 | `useCurrentUser.test.tsx` (completes the 02.02 AC on roles) | 02_02 | 05_04 | 2026-10-19 |
+| D-08 | Saved-draft sentence in the Session expired note | 02_02 decision | 05_04 | 2026-10-19 |

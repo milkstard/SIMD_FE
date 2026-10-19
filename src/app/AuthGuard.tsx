@@ -1,6 +1,10 @@
 import { AuthError, EventType, InteractionStatus } from '@azure/msal-browser';
 import { useMsal } from '@azure/msal-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type ReactNode } from 'react';
+import { meKeys } from '@/api/keys';
+import { hasReportDraft } from '@/features/report/reportDraftStorage';
+import type { CurrentUser } from '@/shared/hooks/useCurrentUser';
 import { isAccessDenied, loginRequest } from './msal';
 import { useSessionStore } from './sessionStore';
 import { SignInPage } from './signIn/SignInPage';
@@ -11,6 +15,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const [error, setError] = useState<AuthError | null>(null);
   const expired = useSessionStore((state) => state.expired);
   const resetSession = useSessionStore((state) => state.reset);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const id = instance.addEventCallback(
@@ -36,7 +41,13 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     void instance.loginRedirect(denied ? { ...loginRequest, prompt: 'select_account' } : loginRequest);
   };
 
-  if (expired) return <SignInPage state="expired" onSignIn={signIn} />;
+  if (expired) {
+    // The token is gone, so /me can't be fetched: use the user the shell already loaded (TopBar).
+    const userId = queryClient.getQueryData<CurrentUser>(meKeys.current())?.id;
+    return (
+      <SignInPage state="expired" hasDraft={!!userId && hasReportDraft(userId)} onSignIn={signIn} />
+    );
+  }
   if (accounts.length > 0) return <>{children}</>;
 
   return <SignInPage state={denied ? 'denied' : 'signIn'} error={error} onSignIn={signIn} />;

@@ -8,8 +8,12 @@ import {
 } from '@azure/msal-browser';
 import { useMsal } from '@azure/msal-react';
 import { ThemeProvider } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { meKeys } from '@/api/keys';
+import { draftKey } from '@/features/report/reportDraftStorage';
+import { currentUser } from '@/test/msw/fixtures';
 import { AuthGuard } from './AuthGuard';
 import { config } from './config';
 import { useSessionStore } from './sessionStore';
@@ -28,7 +32,11 @@ const account: AccountInfo = {
   localAccountId: 'local-1',
 };
 
-function setup(inProgress: InteractionStatus, accounts: AccountInfo[] = []) {
+function setup(
+  inProgress: InteractionStatus,
+  accounts: AccountInfo[] = [],
+  queryClient = new QueryClient(),
+) {
   const callbacks: EventCallbackFunction[] = [];
   const instance = {
     loginRedirect: vi.fn().mockResolvedValue(undefined),
@@ -47,9 +55,11 @@ function setup(inProgress: InteractionStatus, accounts: AccountInfo[] = []) {
 
   const { unmount } = render(
     <ThemeProvider theme={theme}>
-      <AuthGuard>
-        <p>Protected app</p>
-      </AuthGuard>
+      <QueryClientProvider client={queryClient}>
+        <AuthGuard>
+          <p>Protected app</p>
+        </AuthGuard>
+      </QueryClientProvider>
     </ThemeProvider>,
   );
 
@@ -120,7 +130,10 @@ describe('AuthGuard', () => {
   it('shows a generic retry message for other sign-in errors', () => {
     const { emit } = setup(InteractionStatus.None);
 
-    emit({ eventType: EventType.ACQUIRE_TOKEN_FAILURE, error: new AuthError('network_error', 'corr-2') });
+    emit({
+      eventType: EventType.ACQUIRE_TOKEN_FAILURE,
+      error: new AuthError('network_error', 'corr-2'),
+    });
 
     expect(screen.getByRole('alert')).toHaveTextContent("Sign-in didn't finish");
     expect(screen.getByRole('heading', { name: 'Sign in to IncidentHub' })).toBeInTheDocument();
@@ -144,5 +157,45 @@ describe('AuthGuard', () => {
     expect(instance.loginRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ scopes: [config.apiScope] }),
     );
+  });
+
+  describe('saved draft sentence on the session-expired page', () => {
+    const sentence = 'Your unsent report draft is still saved on this device.';
+    const clientWithUser = () => {
+      const client = new QueryClient();
+      client.setQueryData(meKeys.current(), currentUser);
+      return client;
+    };
+
+    afterEach(() => window.localStorage.clear());
+
+    it('shows it when a draft exists for the cached user', () => {
+      window.localStorage.setItem(
+        draftKey(currentUser.id ?? ''),
+        JSON.stringify({ v: 1, values: { title: 'x' } }),
+      );
+      useSessionStore.getState().markExpired();
+      setup(InteractionStatus.None, [account], clientWithUser());
+
+      expect(screen.getByRole('status')).toHaveTextContent(sentence);
+    });
+
+    it('omits it without a draft, for another user, or when the user is not cached', () => {
+      window.localStorage.setItem(
+        draftKey('someone-else'),
+        JSON.stringify({ v: 1, values: { title: 'x' } }),
+      );
+      useSessionStore.getState().markExpired();
+      const { unmount } = setup(InteractionStatus.None, [account], clientWithUser());
+      expect(screen.getByRole('status')).not.toHaveTextContent(sentence);
+      unmount();
+
+      window.localStorage.setItem(
+        draftKey(currentUser.id ?? ''),
+        JSON.stringify({ v: 1, values: { title: 'x' } }),
+      );
+      setup(InteractionStatus.None, [account], new QueryClient());
+      expect(screen.getByRole('status')).not.toHaveTextContent(sentence);
+    });
   });
 });

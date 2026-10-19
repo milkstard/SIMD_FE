@@ -2,10 +2,10 @@ import { http, HttpResponse } from 'msw';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { server } from '@/test/msw/server';
-import { pendingAttachment } from '@/test/msw/fixtures';
-import { catalogApp, checkoutApp } from '@/test/msw/fixtures';
+import { catalogApp, checkoutApp, currentUser, pendingAttachment } from '@/test/msw/fixtures';
 import { mockAuth, renderAtReport } from '@/test/renderWithProviders';
 import { SEVERITIES } from '@/types/severity';
+import { draftKey } from './reportDraftStorage';
 import { ReportIncidentForm } from './ReportIncidentForm';
 import { SEVERITY_HELP } from './severityHelp';
 
@@ -184,5 +184,174 @@ describe('ReportIncidentForm', () => {
 
       await waitFor(() => expect(screen.queryByText('Wait for the uploads to finish.')).not.toBeInTheDocument());
     }, 20_000);
+  });
+  describe('draft autosave', () => {
+    const KEY = draftKey(currentUser.id ?? '');
+    const FULL_DRAFT = {
+      applicationId: checkoutApp.id,
+      environment: 'Production',
+      severity: 'High',
+      title: 'Checkout fails after payment',
+      description: 'Users see an error page.',
+    };
+    const seed = (values: unknown = FULL_DRAFT) =>
+      window.localStorage.setItem(KEY, JSON.stringify({ v: 1, values }));
+    const title = () => screen.getByRole('textbox', { name: /^title/i });
+
+    it('restores the draft after a remount and says so', async () => {
+      const first = renderAtReport(<ReportIncidentForm applications={[checkoutApp, catalogApp]} />);
+      const user = userEvent.setup();
+      await user.click(title());
+      await user.paste('Half written title');
+      await waitFor(() => expect(window.localStorage.getItem(KEY)).toContain('Half written title'), {
+        timeout: 5_000,
+      });
+
+      // Same as a refresh: the whole tree is rebuilt and only localStorage survives.
+      first.unmount();
+      setup();
+
+      expect(await screen.findByText('Draft restored')).toBeInTheDocument();
+      await waitFor(() => expect(title()).toHaveValue('Half written title'));
+    });
+
+    it('can dismiss the restored notice', async () => {
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: /close/i }));
+
+      expect(screen.queryByText('Draft restored')).not.toBeInTheDocument();
+    });
+
+    it('clears the draft after a successful submit', async () => {
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+      expect(await screen.findByText('Incident page INC-1042')).toBeInTheDocument();
+      expect(window.localStorage.getItem(KEY)).toBeNull();
+    });
+
+    it('keeps the draft when the submit fails with a 422', async () => {
+      server.use(
+        http.post('*/incidents', () =>
+          HttpResponse.json(
+            { title: 'Validation failed', status: 422, errors: { title: ['Title is not allowed.'] } },
+            { status: 422, headers: { 'Content-Type': 'application/problem+json' } },
+          ),
+        ),
+      );
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+      expect(await screen.findByText('Title is not allowed.')).toBeInTheDocument();
+      expect(window.localStorage.getItem(KEY)).toContain('Checkout fails after payment');
+    });
+
+    it.each([
+      ['a 500', 500, /Something went wrong on our side/],
+      ['a 403', 403, /You cannot report incidents/],
+      ['a 429', 429, /Too many requests/],
+    ])('keeps the draft when the submit fails with %s', async (_name, status, message) => {
+      server.use(http.post('*/incidents', () => new HttpResponse(null, { status })));
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+      expect(await screen.findByText(message)).toBeInTheDocument();
+      expect(window.localStorage.getItem(KEY)).toContain('Checkout fails after payment');
+    });
+
+    it('keeps the draft when the submit hits a duplicate (409)', async () => {
+      server.use(
+        http.post('*/incidents', () =>
+          HttpResponse.json(
+            { title: 'Duplicate incident', status: 409, existingIncidentNumber: 'INC-1001' },
+            { status: 409, headers: { 'Content-Type': 'application/problem+json' } },
+          ),
+        ),
+      );
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: 'Report incident' }));
+
+      expect(await screen.findByText('INC-1001')).toBeInTheDocument();
+      expect(window.localStorage.getItem(KEY)).toContain('Checkout fails after payment');
+    });
+
+    it('moves focus into the form when the restored notice is dismissed', async () => {
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: /close/i }));
+
+      expect(screen.getByRole('form', { name: 'Report an incident' })).toHaveFocus();
+    });
+
+    it('announces the discard and keeps focus inside the page', async () => {
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: 'Discard draft' }));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Discard' }));
+
+      expect(await screen.findByText('Draft discarded')).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByRole('form', { name: 'Report an incident' })).toHaveFocus());
+    });
+
+    it('discards the draft only after confirmation and empties the form', async () => {
+      seed();
+      const user = setup();
+      await screen.findByText('Draft restored');
+
+      await user.click(screen.getByRole('button', { name: 'Discard draft' }));
+      const dialog = await screen.findByRole('dialog', { name: 'Discard this draft?' });
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(window.localStorage.getItem(KEY)).not.toBeNull();
+      expect(title()).toHaveValue('Checkout fails after payment');
+
+      await user.click(screen.getByRole('button', { name: 'Discard draft' }));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Discard' }));
+
+      await waitFor(() => expect(title()).toHaveValue(''));
+      expect(window.localStorage.getItem(KEY)).toBeNull();
+      expect(screen.queryByText('Draft restored')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Discard draft' })).not.toBeInTheDocument();
+    });
+
+    it('shows no Discard button without a draft', () => {
+      setup();
+
+      expect(screen.queryByRole('button', { name: 'Discard draft' })).not.toBeInTheDocument();
+    });
+
+    it('works when storage is blocked', async () => {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new DOMException('blocked', 'SecurityError');
+      });
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new DOMException('blocked', 'SecurityError');
+      });
+      const user = setup();
+
+      await user.click(title());
+      await user.paste('Still typing');
+
+      expect(title()).toHaveValue('Still typing');
+    });
   });
 });

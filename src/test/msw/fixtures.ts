@@ -43,3 +43,11 @@ export const similarIncidents: components['schemas']['IncidentSummaryDto'][] = s
     status,
   }),
 );
+
+export const currentUser: components['schemas']['CurrentUserDto'] = {
+  id: 'c0de0000-0000-4000-8000-000000000001',
+  displayName: 'Ada Responder',
+  email: 'ada@example.com',
+  roles: ['Responder'],
+  teamIds: ['7ea40000-0000-4000-8000-000000000001'],
+};

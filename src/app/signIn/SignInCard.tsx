@@ -7,17 +7,18 @@ export type SignInState = 'signIn' | 'signingIn' | 'denied' | 'expired';
 interface SignInCardProps {
   state: SignInState;
   error: AuthError | null;
+  hasDraft?: boolean;
   onSignIn?: () => void;
 }
 
-export function SignInCard({ state, error, onSignIn }: SignInCardProps) {
+export function SignInCard({ state, error, hasDraft = false, onSignIn }: SignInCardProps) {
   if (state === 'signingIn') return <SigningIn />;
 
   const denied = state === 'denied';
   const expired = state === 'expired';
   return (
     <>
-      {expired && <ExpiredNote />}
+      {expired && <ExpiredNote hasDraft={hasDraft} />}
       {denied && error && <AccessDenied error={error} />}
       {!denied && !expired && error && (
         <Typography role="alert" variant="body2" color="error">
@@ -80,14 +81,17 @@ function SigningIn() {
   );
 }
 
-function ExpiredNote() {
+function ExpiredNote({ hasDraft }: { hasDraft: boolean }) {
   return (
     <Box
       role="status"
       sx={{ display: 'flex', gap: 2.5, p: 3, borderRadius: '3px', bgcolor: 'brandTint', color: 'text.primary' }}
     >
       <ClockIcon />
-      <Typography variant="body2">Your session ended. Sign in again to carry on.</Typography>
+      <Typography variant="body2">
+        Your session ended. Sign in again to carry on.
+        {hasDraft && ' Your unsent report draft is still saved on this device.'}
+      </Typography>
     </Box>
   );
 }

@@ -1,13 +1,18 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { EmptyState } from '@/shared/EmptyState';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { ReportFormSkeleton } from './ReportFormSkeleton';
 import { ReportIncidentForm } from './ReportIncidentForm';
 import { useApplications } from './useApplications';
 
 function ReportBody() {
   const { data, isPending, isError, refetch, isFetching } = useApplications();
+  // The draft is keyed by user: wait for /me so the restore doesn't flash in after the form shows.
+  // After the first failed attempt stop waiting (the query keeps retrying): no /me only means no draft yet.
+  const user = useCurrentUser();
+  const waitingForUser = user.isPending && user.failureCount === 0;
 
-  if (isPending && !isError) return <ReportFormSkeleton />;
+  if ((isPending && !isError) || waitingForUser) return <ReportFormSkeleton />;
 
   if (isError) {
     return (

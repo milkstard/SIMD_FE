@@ -1,10 +1,15 @@
 import { InteractionStatus, type AccountInfo } from '@azure/msal-browser';
 import { useMsal } from '@azure/msal-react';
 import { ThemeProvider } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { setConnectionState } from '@/realtime/connectionStore';
+import { currentUser } from '@/test/msw/fixtures';
+import { server } from '@/test/msw/server';
+import { mockAuth } from '@/test/renderWithProviders';
 import { routes } from '../routes';
 import { theme } from '../theme';
 
@@ -29,15 +34,36 @@ function renderAt(path: string, activeAccount: AccountInfo | null = account) {
     accounts: activeAccount ? [activeAccount] : [],
   } as unknown as ReturnType<typeof useMsal>);
   const router = createMemoryRouter(routes, { initialEntries: [path] });
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </ThemeProvider>,
   );
 }
 
+// Same name as the MSAL account unless a test says otherwise, so the avatar doesn't change once /me loads.
+function useMe(displayName: string | null) {
+  server.use(
+    http.get('*/me', () =>
+      displayName === null
+        ? HttpResponse.json({ title: 'Unavailable' }, { status: 500 })
+        : HttpResponse.json({ ...currentUser, displayName }),
+    ),
+  );
+}
+
 describe('AppLayout', () => {
-  afterEach(() => act(() => setConnectionState('offline')));
+  beforeEach(() => {
+    mockAuth();
+    useMe(account.name ?? null);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    return act(() => setConnectionState('offline'));
+  });
 
   it('has a Main navigation with Monitor, Incidents and Admin', async () => {
     renderAt('/');
@@ -74,8 +100,15 @@ describe('AppLayout', () => {
   });
 
   it('falls back to the username, then to a generic label, for the avatar', async () => {
+    useMe(null);
     renderAt('/', { ...account, name: undefined });
     expect(await screen.findByRole('img', { name: 'ana.reyes@corp.example' })).toBeInTheDocument();
+  });
+
+  it('prefers the display name from /me for the avatar', async () => {
+    useMe('Ada Responder');
+    renderAt('/');
+    expect(await screen.findByRole('img', { name: 'Ada Responder' })).toBeInTheDocument();
   });
 
   it('reaches the wordmark, nav links, Report incident and the bell by keyboard', async () => {
