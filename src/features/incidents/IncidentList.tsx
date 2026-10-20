@@ -5,6 +5,7 @@ import { incidentColumns } from './incidentColumns';
 import type { IncidentSort } from './incidentFilters';
 import { fromSortModel, toSortModel } from './incidentSort';
 import type { IncidentRow } from './useIncidents';
+import { useFillViewportHeight } from './useFillViewportHeight';
 import { useLoadMoreOnScroll } from './useLoadMoreOnScroll';
 
 interface IncidentListProps {
@@ -34,6 +35,7 @@ export function IncidentList({
   onSortChange,
 }: IncidentListProps) {
   const apiRef = useGridApiRef();
+  const { ref, height } = useFillViewportHeight<HTMLDivElement>();
   useLoadMoreOnScroll({
     apiRef,
     rowCount: rows.length,
@@ -45,7 +47,7 @@ export function IncidentList({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Box sx={{ height: 'calc(100vh - 400px)', minHeight: 360 }}>
+      <Box ref={ref} sx={{ height }}>
         <DataGrid
           apiRef={apiRef}
           aria-label="Incidents"
